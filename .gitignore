@@ -1,0 +1,11 @@
+# M3U playlist files
+*.m3u
+
+# Zip packages
+*.zip
+
+# macOS
+.DS_Store
+
+# Roku build artifacts
+*.pkg

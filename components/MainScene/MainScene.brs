@@ -12,7 +12,8 @@ sub init()
     m.video = m.top.FindNode("Video")
     m.video.ObserveField("state", "checkState")
 
-    showdialog()  'Force a keyboard dialog.  
+    ' Load channels from local 1.m3u file automatically
+    m.get_channel_list.control = "RUN"
 End sub
 
 ' **************************************************************
@@ -25,10 +26,10 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     
         if(key = "right")
             m.list.SetFocus(false)
-            m.top.SetFocus(true)
+            m.video.SetFocus(true)
             m.video.translation = [0, 0]
-            m.video.width = 0
-            m.video.height = 0
+            m.video.width = 1920
+            m.video.height = 1080
             result = true
         else if(key = "left")
             m.list.SetFocus(true)
@@ -92,6 +93,13 @@ sub setChannel()
 
 	m.top.backgroundURI = "pkg:/images/rsgde_bg_hd.jpg"
 	m.video.trickplaybarvisibilityauto = false
+
+	' Play video in fullscreen
+	m.list.SetFocus(false)
+	m.video.SetFocus(true)
+	m.video.translation = [0, 0]
+	m.video.width = 1920
+	m.video.height = 1080
 
 	m.video.control = "play"
 end sub

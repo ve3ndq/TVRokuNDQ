@@ -5,21 +5,8 @@ end sub
 ' **********************************************
 
 sub getContent()
-	feedurl = m.global.feedurl
-
-	m.port = CreateObject ("roMessagePort")
-	searchRequest = CreateObject("roUrlTransfer")
-	searchRequest.setURL(feedurl)
-	searchRequest.EnableEncodings(true)
-	httpsReg = CreateObject("roRegex", "^https:", "")
-	if httpsReg.isMatch(feedurl)
-		searchRequest.SetCertificatesFile ("common:/certs/ca-bundle.crt")
-		searchRequest.AddHeader ("X-Roku-Reserved-Dev-Id", "")
-		searchRequest.InitClientCertificates ()
-	end if
-
-
-	text = searchRequest.getToString()
+	' Read from local 1.m3u file instead of URL
+	text = ReadAsciiFile("pkg:/1.m3u")
 
 	reHasGroups = CreateObject("roRegex", "group-title\=" + chr(34) + "?([^" + chr(34) + "]*)"+chr(34)+"?,","")
 	hasGroups = reHasGroups.isMatch(text)
