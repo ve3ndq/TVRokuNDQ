@@ -28,7 +28,7 @@ For detailed instructions, see: [How to Enable Developer Mode on Roku](https://w
    ```bash
    zip -r SimpleIPTVRoku.zip manifest source/ components/ images/ 1.m3u
    ```
-4. Open your browser and go to `http://[ROKU_IP]:8060`
+4. Open your browser and go to `http://[ROKU_IP]:8060` (or port 80)
 5. Login with your developer credentials
 6. Upload the `SimpleIPTVRoku.zip` file
 
@@ -52,6 +52,82 @@ http://stream-url.com/stream.m3u8
 ## Supported Formats
 
 HLS, MP4, MKV, MP3, AVI, M4V, TS, MPEG-4, FLV, VOB, OGG, OGV, WebM, MOV, WMV, ASF, AMV, MPG, MP2, MPEG, MPE, MPV, MPEG2
+
+## Home Assistant Integration
+
+The app supports deep linking, allowing Home Assistant to launch and play specific channels automatically.
+
+### Setup
+
+1. **Add Roku to Home Assistant** - The Roku integration should auto-discover your device, or add it manually with your Roku's IP address.
+
+2. **Find your Dev App ID** - After sideloading the app, it will have an ID like `dev` or a custom ID if you specified one in the manifest.
+
+3. **Create Home Assistant Scripts** - Add these to your `configuration.yaml`:
+
+```yaml
+script:
+  play_roku_channel:
+    alias: "Play Roku IPTV Channel"
+    fields:
+      channel_number:
+        description: "Channel index (0-based)"
+        example: "0"
+    sequence:
+      - service: roku.launch
+        data:
+          entity_id: media_player.roku
+          content_id: "{{ channel_number }}"
+          content_type: "channel"
+          media_type: "dev"  # or your custom app ID
+  
+  # Quick shortcuts for specific channels
+  play_sportsnet_east:
+    alias: "Play Sportsnet East"
+    sequence:
+      - service: script.play_roku_channel
+        data:
+          channel_number: "0"
+  
+  play_sportsnet_one:
+    alias: "Play Sportsnet One"
+    sequence:
+      - service: script.play_roku_channel
+        data:
+          channel_number: "1"
+```
+
+### Usage Examples
+
+**From Home Assistant UI:**
+- Call the `play_roku_channel` script with a channel number
+
+**From Automations:**
+```yaml
+automation:
+  - alias: "Play sports at game time"
+    trigger:
+      - platform: time
+        at: "19:00:00"
+    action:
+      - service: script.play_sportsnet_east
+```
+
+**Via REST API:**
+```bash
+curl -X POST http://homeassistant.local:8123/api/services/script/play_roku_channel \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"channel_number": "0"}'
+```
+
+### Channel Index Reference
+
+Channels are indexed starting from 0 in the order they appear in your M3U file:
+- 0: First channel
+- 1: Second channel
+- 2: Third channel
+- etc.
 
 ## Credits
 

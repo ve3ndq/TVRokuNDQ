@@ -1,0 +1,25 @@
+Sample HA Script for starting a channel: 
+
+
+sequence:
+  - type: turn_on
+    device_id: de064bd536a62e1bc2660e4007e0a604
+    entity_id: a32ecf49687bfeee13868944129e0270
+    domain: remote
+    metadata:
+      secondary: false
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 3
+      milliseconds: 0
+  - service: media_player.select_source
+    metadata: {}
+    data:
+      source: dev
+    target:
+      device_id: de064bd536a62e1bc2660e4007e0a604
+
+
+
+

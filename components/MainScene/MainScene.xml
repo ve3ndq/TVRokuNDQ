@@ -4,6 +4,11 @@
 
 <component name="MainScene" extends="Scene" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://rokudev.roku.com/rokudev/schema/RokuSceneGraph.xsd">
 <script type="text/brightscript" uri="pkg:/components/MainScene/MainScene.brs"/>
+
+<interface>
+    <field id="channelId" type="string" />
+</interface>
+
 <children>
     <LabelList
     	id="list"

@@ -24,6 +24,8 @@ sub getContent()
 		groups = []
 	end if
 
+	channelIndex = 0
+	
 	REM #EXTINF:-1 tvg-logo="" group-title="uk",BBC ONE HD
 	for each line in reLineSplit.Split (text)
 		if inExtinf
@@ -31,8 +33,10 @@ sub getContent()
 			if maPath.Count () = 2
 				item = group.CreateChild("ContentNode")
 				item.url = maPath [1]
-				item.title = title
+				' Prepend channel ID to title
+				item.title = "[" + channelIndex.ToStr() + "] " + title
 
+				channelIndex = channelIndex + 1
 				inExtinf = False
 			end if
 		end if

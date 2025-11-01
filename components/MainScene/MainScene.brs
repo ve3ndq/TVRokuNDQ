@@ -12,6 +12,9 @@ sub init()
     m.video = m.top.FindNode("Video")
     m.video.ObserveField("state", "checkState")
 
+    ' Observe channelId for deep linking
+    m.top.ObserveField("channelId", "onChannelIdChanged")
+
     ' Load channels from local 1.m3u file automatically
     m.get_channel_list.control = "RUN"
 End sub
@@ -65,6 +68,14 @@ end sub
 sub SetContent()    
     m.list.content = m.get_channel_list.content
     m.list.SetFocus(true)
+    
+    ' If channelId was set via deep link, play that channel
+    if m.top.channelId <> invalid and m.top.channelId <> "" then
+        playChannelById(m.top.channelId)
+    else
+        ' Auto-play channel 0 by default on launch
+        playChannelById("0")
+    end if
 end sub
 
 sub setChannel()
@@ -139,5 +150,51 @@ sub onKeyPress()
         m.save_feed_url.control = "RUN"
         '    m.top.dialog.visible ="false"
         '    m.top.unobserveField("buttonSelected")
+    end if
+end sub
+
+' **************************************************************
+' Deep linking support
+' **************************************************************
+
+sub onChannelIdChanged()
+    ' Called when channelId is set via deep link
+    if m.list.content <> invalid then
+        playChannelById(m.top.channelId)
+    end if
+end sub
+
+sub playChannelById(channelId as String)
+    ' Play channel by index (0-based) or by title match
+    print "Playing channel: "; channelId
+    
+    if m.list.content = invalid then return
+    
+    ' Try to parse as numeric index first
+    channelIndex = channelId.ToInt()
+    
+    ' Check if we have grouped content or flat list
+    if m.list.content.getChild(0).getChild(0) = invalid then
+        ' Flat list
+        totalChannels = m.list.content.getChildCount()
+        if channelIndex >= 0 and channelIndex < totalChannels then
+            m.list.itemSelected = channelIndex
+            setChannel()
+        end if
+    else
+        ' Grouped list - navigate to the channel
+        currentIndex = 0
+        for groupIdx = 0 to m.list.content.getChildCount() - 1
+            group = m.list.content.getChild(groupIdx)
+            for itemIdx = 0 to group.getChildCount() - 1
+                if currentIndex = channelIndex then
+                    m.list.jumpToItem = currentIndex
+                    m.list.itemSelected = currentIndex
+                    setChannel()
+                    return
+                end if
+                currentIndex = currentIndex + 1
+            end for
+        end for
     end if
 end sub
