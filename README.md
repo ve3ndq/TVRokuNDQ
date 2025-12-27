@@ -129,9 +129,7 @@ Channels are indexed starting from 0 in the order they appear in your M3U file:
 - 2: Third channel
 - etc.
 
-## Credits
 
-Originally forked from [sudo97](https://github.com/sudo97)'s SimpleIPTVRoku project.
 
 ## License
 
