@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component name="browse_master_fetch" extends="Task">
+    <interface>
+        <field id="url" type="string" />
+        <field id="status" type="string" />
+        <field id="error" type="string" />
+        <field id="groups" type="assocarray" />
+        <field id="responseLength" type="integer" />
+        <field id="groupsCount" type="integer" />
+        <field id="channelCount" type="integer" />
+        <field id="durationMs" type="integer" />
+    </interface>
+
+    <script type="text/brightscript" uri="pkg:/components/browse_master_fetch/browse_master_fetch.brs" />
+</component>

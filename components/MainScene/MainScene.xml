@@ -36,6 +36,10 @@
     <browse_master
         id="browse_master"
         visible="false"/>
+
+    <favorites_manager
+        id="favorites_manager"
+        visible="false"/>
     	
 </children>
 </component>

@@ -16,18 +16,33 @@ sub init()
 
     m.groupsList.ObserveField("itemSelected", "onGroupSelected")
     m.channelsList.ObserveField("itemSelected", "onChannelToggle")
+
+    ' Async fetch task wiring
+    m.fetchTask = m.top.findNode("fetchTask")
+    if m.fetchTask <> invalid then
+        m.fetchTask.ObserveField("status", "onFetchStatus")
+        m.fetchTask.ObserveField("groups", "onFetchGroups")
+        m.fetchTask.ObserveField("error", "onFetchError")
+    end if
 end sub
 
 sub onMasterUrlChanged()
     if m.top.masterUrl = "" or m.top.masterUrl = invalid then return
 
     m.loadingLabel.visible = true
+    m.statusLabel.visible = true
     m.groupsList.visible = false
     m.channelsList.visible = false
-    m.statusLabel.text = ""
+    m.statusLabel.text = "Fetching master playlist..."
 
-    ' Fetch and parse master playlist
-    parseMasterPlaylist(m.top.masterUrl)
+    ' Start async fetch task if available
+    if m.fetchTask <> invalid then
+        m.fetchTask.url = m.top.masterUrl
+        m.fetchTask.control = "RUN"
+    else
+        ' Fallback to synchronous parsing (may block UI)
+        parseMasterPlaylist(m.top.masterUrl)
+    end if
 end sub
 
 sub parseMasterPlaylist(url as String)
@@ -36,6 +51,7 @@ sub parseMasterPlaylist(url as String)
     http.SetCertificatesFile("common:/certs/ca-bundle.crt")
     http.initClientCertificates()
 
+    m.statusLabel.text = "Downloading: " + url
     response = http.GetToString()
 
     if response = "" then
@@ -43,6 +59,8 @@ sub parseMasterPlaylist(url as String)
         m.loadingLabel.visible = false
         return
     end if
+
+    m.statusLabel.text = "Parsing master playlist..."
 
     ' Parse M3U
     lines = response.Split(chr(10))
@@ -91,6 +109,7 @@ sub parseMasterPlaylist(url as String)
     m.currentGroup = ""
 
     m.loadingLabel.visible = false
+    m.statusLabel.visible = true
     m.groupsList.visible = true
     m.channelsList.visible = true
     m.groupsList.SetFocus(true)
@@ -187,3 +206,59 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
 
     return false
 end function
+
+' **************************************************************
+' Async fetch handlers
+' **************************************************************
+
+sub onFetchStatus()
+    if m.fetchTask = invalid then return
+    msg = m.fetchTask.status
+    if msg = invalid then return
+    m.statusLabel.visible = true
+    m.statusLabel.text = msg
+end sub
+
+sub onFetchError()
+    if m.fetchTask = invalid then return
+    err = m.fetchTask.error
+    if err = invalid or err = "" then return
+    m.loadingLabel.visible = false
+    m.statusLabel.visible = true
+    m.statusLabel.text = "Error: " + err
+end sub
+
+sub onFetchGroups()
+    if m.fetchTask = invalid then return
+    groups = m.fetchTask.groups
+    if groups = invalid then return
+
+    ' Persist parsed groups and rebuild lists
+    m.groups = groups
+
+    groupsRoot = CreateObject("roSGNode", "ContentNode")
+    for each groupKey in m.groups
+        item = groupsRoot.CreateChild("ContentNode")
+        countStr = "0"
+        if m.groups[groupKey] <> invalid then countStr = m.groups[groupKey].Count().ToStr()
+        item.title = groupKey + " (" + countStr + ")"
+        item.id = groupKey
+    end for
+
+    m.groupsList.content = groupsRoot
+    m.currentGroup = ""
+
+    m.loadingLabel.visible = false
+    m.groupsList.visible = true
+    m.channelsList.visible = true
+    m.groupsList.SetFocus(true)
+    m.focusLeft = true
+
+    if groupsRoot.getChildCount() > 0 then
+        m.groupsList.itemSelected = 0
+        onGroupSelected()
+    else
+        m.statusLabel.visible = true
+        m.statusLabel.text = "No groups found in master playlist"
+    end if
+end sub

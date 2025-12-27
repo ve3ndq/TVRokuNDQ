@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component name="favorites_manager" extends="Group">
+    <script type="text/brightscript" uri="pkg:/components/favorites_manager/favorites_manager.brs" />
+
+    <children>
+        <Rectangle id="scrim" width="1920" height="1080" color="#000000" opacity="0.6" />
+
+        <Group id="panel" translation="[240, 160]">
+            <Rectangle width="1440" height="760" color="#101010" opacity="0.95" />
+            <Label id="title" translation="[40, 30]" width="1360" height="50" text="Manage Favorites" font="MediumBoldSystemFont" horizAlign="left" />
+            <Label id="info" translation="[40, 80]" width="1360" height="40" text="Press OK to remove a favorite. Back to exit." horizAlign="left" />
+
+            <LabelList id="favList" translation="[40, 140]" width="1360" height="600" itemSpacing="[0,8]" />
+            <Label id="status" translation="[40, 760]" width="1360" height="40" text="" horizAlign="left" />
+        </Group>
+    </children>
+</component>

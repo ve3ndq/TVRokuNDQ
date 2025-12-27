@@ -67,5 +67,26 @@ sub getContent()
 		end if
 	end for
 
+	' Prepend Favorites group from registry (if any)
+	reg = CreateObject("roRegistrySection", "profile")
+	if reg.Exists("favorites") then
+		favJson = reg.Read("favorites")
+		favs = ParseJson(favJson)
+		if favs <> invalid and favs.Count() > 0 then
+			favGroup = con.CreateChild("ContentNode")
+			favGroup.contenttype = "SECTION"
+			favGroup.title = "Favorites"
+			favGroup.id = "Favorites"
+
+			for each fav in favs
+				if fav <> invalid and fav.url <> invalid then
+					item = favGroup.CreateChild("ContentNode")
+					item.url = fav.url
+					item.title = fav.title
+				end if
+			end for
+		end if
+	end if
+
 	m.top.content = con
 end sub
