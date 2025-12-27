@@ -43,6 +43,14 @@ For detailed instructions, see: [How to Enable Developer Mode on Roku](https://w
 - **Return to List**: Press **Back** or **Left** arrow
 - **Options**: Press **Options** button to manually enter a playlist URL (optional)
 
+## Master Playlist Import
+
+- Configure the master playlist URL in `.env` as `MASTER_M3U_URL` (default: `https://iptv-org.github.io/iptv/master.m3u`). `.env` is ignored by git.
+- On device, press **Options** → select **Add channels from master playlist**.
+- The master file downloads only when you choose this menu item (no automatic downloads).
+- Browse groups (left) and channels (right); press **OK** on a channel to mark it for import.
+- After confirming, selected channels are queued for favorites; restart the app to see them in `1.m3u` favorites order.
+
 ## M3U Playlist Format
 
 The app reads from a local `1.m3u` file. Format example:
