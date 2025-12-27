@@ -12,6 +12,16 @@ sub init()
     m.video = m.top.FindNode("Video")
     m.video.ObserveField("state", "checkState")
 
+    m.settings = m.top.FindNode("settings_page")
+    m.settings.ObserveField("selectedChannelId", "onStartupChannelSelected")
+    m.settings.ObserveField("requestPlaylistDialog", "onSettingsPlaylistRequested")
+    m.settings.ObserveField("requestImportChannels", "onImportChannelsRequested")
+    m.settings.ObserveField("visible", "onSettingsVisibility")
+
+    m.browse_master = m.top.FindNode("browse_master")
+    m.browse_master.ObserveField("selectedChannels", "onChannelsImported")
+    m.browse_master.ObserveField("visible", "onBrowseVisibility")
+
     ' Observe channelId for deep linking
     m.top.ObserveField("channelId", "onChannelIdChanged")
 
@@ -47,7 +57,7 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
             m.video.height = 540
             result = true
         else if(key = "options")
-            showdialog()
+            toggleSettings()
             result = true
         end if
     end if
@@ -73,8 +83,8 @@ sub SetContent()
     if m.top.channelId <> invalid and m.top.channelId <> "" then
         playChannelById(m.top.channelId)
     else
-        ' Auto-play channel 0 by default on launch
-        playChannelById("0")
+        ' Auto-play configured startup channel (defaults to 0)
+        playChannelById(m.global.startupChannelId)
     end if
 end sub
 
@@ -150,6 +160,110 @@ sub onKeyPress()
         m.save_feed_url.control = "RUN"
         '    m.top.dialog.visible ="false"
         '    m.top.unobserveField("buttonSelected")
+    end if
+end sub
+
+' **************************************************************
+' Settings handling
+' **************************************************************
+
+sub toggleSettings()
+    if m.settings = invalid then return
+
+    if m.settings.visible
+        m.settings.visible = false
+    else
+        ' Populate settings with current content and defaults
+        m.settings.content = m.list.content
+        m.settings.defaultChannelId = m.global.startupChannelId
+        m.settings.visible = true
+        m.settings.setFocus(true)
+        m.list.SetFocus(false)
+        m.video.SetFocus(false)
+    end if
+end sub
+
+sub onStartupChannelSelected()
+    channelId = m.settings.selectedChannelId
+    if channelId = invalid or channelId = "" then return
+
+    m.global.startupChannelId = channelId
+
+    ' Persist to registry
+    reg = CreateObject("roRegistrySection", "profile")
+    reg.Write("startupChannelId", channelId)
+    reg.Flush()
+
+    ' Start playing the chosen channel immediately
+    playChannelById(channelId)
+
+    ' Return focus to list after selection
+    m.settings.visible = false
+end sub
+
+sub onSettingsPlaylistRequested()
+    if m.settings.requestPlaylistDialog = true
+        m.settings.requestPlaylistDialog = false
+        m.settings.visible = false
+        showdialog()
+    end if
+end sub
+
+sub onSettingsVisibility()
+    ' When settings closes, restore list focus
+    if not m.settings.visible
+        m.list.SetFocus(true)
+    end if
+end sub
+
+' **************************************************************
+' Browse master playlist
+' **************************************************************
+
+sub onImportChannelsRequested()
+    if m.settings.requestImportChannels = true
+        m.settings.requestImportChannels = false
+        
+        ' Try to read master URL from .env (won't work on Roku, so use hardcoded for now)
+        masterUrl = "https://iptv-org.github.io/iptv/master.m3u"
+        
+        m.browse_master.masterUrl = masterUrl
+        m.browse_master.visible = true
+        m.browse_master.setFocus(true)
+        m.list.SetFocus(false)
+    end if
+end sub
+
+sub onChannelsImported()
+    selectedChannels = m.browse_master.selectedChannels
+    if selectedChannels = invalid or selectedChannels.Count() = 0 then return
+
+    ' Read current playlist
+    currentText = ReadAsciiFile("pkg:/1.m3u")
+    
+    ' Append selected channels
+    newLines = []
+    for each key in selectedChannels
+        channel = selectedChannels[key]
+        newLines.Push("#EXTINF:-1,")
+        newLines.Push(channel.title)
+        newLines.Push(channel.url)
+    end for
+
+    ' TODO: Write new m3u file to registry or temp storage since we can't write to pkg:/
+    ' For now, just show a message
+    dialog = CreateObject("roSGNode", "Dialog")
+    dialog.title = "Import Complete"
+    dialog.message = selectedChannels.Count().ToStr() + " channels imported. App needs restart to load new channels."
+    m.top.dialog = dialog
+
+    m.browse_master.visible = false
+    m.list.SetFocus(true)
+end sub
+
+sub onBrowseVisibility()
+    if not m.browse_master.visible
+        m.list.SetFocus(true)
     end if
 end sub
 

@@ -28,6 +28,14 @@
     <save_feed_url
     	id="save_feed_url"
     	control="STOP"/>
+
+    <settings_page
+        id="settings_page"
+        visible="false"/>
+
+    <browse_master
+        id="browse_master"
+        visible="false"/>
     	
 </children>
 </component>

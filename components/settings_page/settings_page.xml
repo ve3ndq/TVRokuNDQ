@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component name="settings_page" extends="Group">
+    <interface>
+        <field id="content" type="node" />
+        <field id="defaultChannelId" type="string" />
+        <field id="selectedChannelId" type="string" />
+        <field id="requestPlaylistDialog" type="boolean" />
+        <field id="requestImportChannels" type="boolean" />
+    </interface>
+
+    <script type="text/brightscript" uri="pkg:/components/settings_page/settings_page.brs" />
+
+    <children>
+        <Rectangle id="scrim" width="1920" height="1080" color="#000000" opacity="0.6" visible="true" />
+
+        <Group id="panel" translation="[240, 160]">
+            <Rectangle width="1440" height="760" color="#101010" opacity="0.95" />
+            <Label id="settingsTitle" translation="[40, 30]" width="1360" height="50" text="Settings" font="MediumBoldSystemFont" horizAlign="left" />
+            <Label id="settingsSubtitle" translation="[40, 80]" width="1360" height="40" text="Select default startup channel. First item opens playlist URL editor." horizAlign="left" />
+
+            <LabelList id="settingsList" translation="[40, 140]" width="1360" itemSpacing="[0, 8]" />
+        </Group>
+    </children>
+</component>

@@ -9,11 +9,17 @@ sub Main(args as Dynamic)
         url = "https://tinyurl.com/yaoc6zpo"
     end if
 
+    ' Default startup channel index (string). Fall back to 0 if not set.
+    startupChannelId = "0"
+    if reg.Exists("startupChannelId") then
+        startupChannelId = reg.Read("startupChannelId")
+    end if
+
     screen = CreateObject("roSGScreen")
     m.port = CreateObject("roMessagePort")
     screen.setMessagePort(m.port)
     m.global = screen.getGlobalNode()
-    m.global.addFields({feedurl: url})
+    m.global.addFields({feedurl: url, startupChannelId: startupChannelId})
     
     ' Handle deep linking - extract channel parameter
     channelId = invalid

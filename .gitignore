@@ -10,3 +10,5 @@
 
 # Roku build artifacts
 *.pkg
+# Environment variables
+.env

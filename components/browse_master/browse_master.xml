@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component name="browse_master" extends="Group">
+    <interface>
+        <field id="masterUrl" type="string" />
+        <field id="selectedChannels" type="assocarray" />
+        <field id="content" type="node" />
+        <field id="requestAddChannels" type="boolean" />
+    </interface>
+
+    <script type="text/brightscript" uri="pkg:/components/browse_master/browse_master.brs" />
+
+    <children>
+        <Rectangle id="scrim" width="1920" height="1080" color="#000000" opacity="0.6" />
+
+        <Group id="panel" translation="[120, 100]">
+            <Rectangle width="1680" height="880" color="#101010" opacity="0.95" />
+            <Label id="title" translation="[40, 30]" width="1600" height="50" text="Browse Master Channels" font="MediumBoldSystemFont" horizAlign="left" />
+            <Label id="loadingLabel" translation="[40, 90]" width="1600" height="40" text="Loading..." horizAlign="left" visible="true" />
+
+            <LabelList id="groupsList" translation="[40, 90]" width="800" height="720" visible="false" />
+            <LabelList id="channelsList" translation="[880, 90]" width="720" height="720" visible="false" />
+
+            <Label id="statusLabel" translation="[40, 820]" width="1600" height="40" text="" horizAlign="left" />
+        </Group>
+    </children>
+</component>

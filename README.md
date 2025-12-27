@@ -28,9 +28,13 @@ For detailed instructions, see: [How to Enable Developer Mode on Roku](https://w
    ```bash
    zip -r SimpleIPTVRoku.zip manifest source/ components/ images/ 1.m3u
    ```
-4. Open your browser and go to `http://[ROKU_IP]:8060` (or port 80)
+4. Open your browser and go to `http://[ROKU_IP]:80` (or port 80)
 5. Login with your developer credentials
 6. Upload the `SimpleIPTVRoku.zip` file
+
+## Command to package on windows
+ Compress-Archive -Path manifest,source,components,images,1.m3u -DestinationPath SimpleIPTVRoku.zip -Force; Get-Item SimpleIPTVRoku.zip
+
 
 ## Usage
 
